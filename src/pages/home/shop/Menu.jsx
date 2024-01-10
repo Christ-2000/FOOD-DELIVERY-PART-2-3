@@ -7,6 +7,8 @@ const Menu =()=>{
     const [filteredItems,setFilteredItems]= useState([]);
     const [selectedCategory,setSelectedCategory]=useState("all");
     const [sortOption,setSortOption] =useState("default");
+    const [currentPage,setcurrentPage] =useState(1);
+    const [itemsPerPage] = useState(8);
     
     //leading data
     useEffect(()=>{
@@ -36,12 +38,14 @@ const Menu =()=>{
         :menu.filter((item)=>item.category=== category);
         setFilteredItems(filtered);
         setSelectedCategory(category);
+        setcurrentPage(1)
     };
 
 //show all data
 const showAll=() =>{
     setFilteredItems(menu);
-    setSelectedCategory("all")
+    setSelectedCategory("all");
+    setcurrentPage(1)
 }
 
 //sorting based onA-Z,Z-A , lOW-HIGH PRICING
@@ -69,10 +73,15 @@ const handleSortChange =(option)=>{
         // code block
         break;
     }
-    setFilteredItems(sortedItems)
+    setFilteredItems(sortedItems);
+    setcurrentPage(1)
 };
     
-
+//pagination logic
+const indexOfLastItem =currentPage + itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = filteredItems.slice(indexOfFirstItem,indexOfLastItem);
+const paginate =(pageNumber)=>setcurrentPage(pageNumber);
 
 
 return(
@@ -188,7 +197,7 @@ return(
         
       </div>
     </div>
-    {/*filtering and sorting*/}
+    {/*menu shop section*/}
     <div className='section-container'>
       {/* filtering  and sorting*/}
       <div className='flex flex-col md:flex-row flex-wrap md:justify-between items-center space-y-3 mb-8'>
@@ -237,11 +246,25 @@ return(
        {/* products card*/}
        <div className='grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-4'>
         {
-         filteredItems.map((item) =>(
+         currentItems.map((item) =>(
            <Cards key={item._id} item={item}/>
          ))
 
 }
+       </div>
+       {/* pagination section*/}
+       <div>
+        {
+          Array.from({length:Math.ceil(filteredItems.length / itemsPerPage)}).map((_, index) =>{
+            <button 
+            key={index + 1}
+            onClick={() => paginate(index + 1)}
+            >
+              {index + 1}
+
+            </button>
+          })
+        }
        </div>
 
     </div>
